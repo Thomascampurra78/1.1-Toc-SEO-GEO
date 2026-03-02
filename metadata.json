@@ -1,0 +1,5 @@
+{
+  "name": "ToC SEO/GEO Analyzer",
+  "description": "Analyze VW PKW URLs for missing Table of Contents by detecting internal anchor links.",
+  "requestFramePermissions": []
+}
