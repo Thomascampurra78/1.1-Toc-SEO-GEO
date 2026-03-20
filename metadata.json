@@ -1,5 +1,5 @@
 {
-  "name": "ToC SEO/GEO Analyzer",
-  "description": "Analyze VW PKW URLs for missing Table of Contents by detecting internal anchor links.",
+  "name": "1.1 ToC SEO/GEO Analyzer",
+  "description": "Analyze VW PKW URLs for missing Table of Contents, heading hierarchy, keyword richness, proper list markup, and FAQ sections.",
   "requestFramePermissions": []
 }

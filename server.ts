@@ -36,13 +36,12 @@ async function startServer() {
       let details = null;
 
       if (hasToC) {
-        // 3. Keywords: Check if anchor text is descriptive (e.g., > 2 words)
+        // Keywords: Check if anchor text is descriptive (e.g., > 2 words)
         const descriptiveText = internalLinks.toArray().some(el => {
           const text = $(el).text().trim();
           return text.split(/\s+/).length >= 3;
         });
 
-        // 4. Nesting: Check for H2 and H3 tags
         const hasH2 = $('h2').length > 0;
         const hasH3 = $('h3').length > 0;
         const nestingOk = hasH2 && hasH3;
@@ -63,7 +62,26 @@ async function startServer() {
         };
       }
 
-      res.json({ url, hasToC, details });
+      // List Detection Logic
+      const liElements = $('li');
+      const liCount = liElements.length;
+      const ulCount = $('ul').length;
+      const olCount = $('ol').length;
+
+      const listAnalysis = {
+        isPresent: liCount > 0,
+        isStandard: liCount > 0 && (liElements.closest('ul').length > 0 || liElements.closest('ol').length > 0)
+      };
+
+      // FAQ Detection Logic
+      // Look for text like "FAQ" or "Frequently Asked Questions" in headings or common container classes
+      const faqKeywords = ['faq', 'frequently asked questions', 'häufig gestellte fragen', 'fragen & antworten'];
+      const hasFAQ = $('h1, h2, h3, h4, h5, h6, span, div, section').toArray().some(el => {
+        const text = $(el).text().toLowerCase().trim();
+        return faqKeywords.some(keyword => text.includes(keyword));
+      });
+
+      res.json({ url, hasToC, details, listAnalysis, hasFAQ });
     } catch (error: any) {
       console.error(`Error analyzing ${url}:`, error.message);
       res.status(500).json({ url, error: error.message, hasToC: false });

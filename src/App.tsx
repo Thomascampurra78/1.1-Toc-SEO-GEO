@@ -18,11 +18,16 @@ interface AnalysisDetail {
 interface AnalysisResult {
   url: string;
   hasToC: boolean;
+  hasFAQ: boolean;
   error?: string;
   status: 'pending' | 'loading' | 'success' | 'error';
   details?: {
     keywords: AnalysisDetail;
     nesting: AnalysisDetail;
+  };
+  listAnalysis?: {
+    isPresent: boolean;
+    isStandard: boolean;
   };
 }
 
@@ -66,6 +71,7 @@ export default function App() {
     const initialResults: AnalysisResult[] = urlList.map(url => ({
       url,
       hasToC: false,
+      hasFAQ: false,
       status: 'loading'
     }));
     setResults(initialResults);
@@ -90,6 +96,7 @@ export default function App() {
         updatedResults[i] = {
           url,
           hasToC: false,
+          hasFAQ: false,
           status: 'error',
           error: err.message
         };
@@ -108,7 +115,7 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-5xl font-bold tracking-tight mb-4"
           >
-            1.1 ToC SEO/GEO control elements for VW PKW Urls
+            1.1 ToC -  faq - list control elements for VW PKW Urls
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0 }}
@@ -179,6 +186,8 @@ export default function App() {
                     <tr className="bg-gray-50 border-bottom border-gray-100">
                       <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-400">URL</th>
                       <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-400">ToC Detected</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-400">List Analysis</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-400">FAQ Detected</th>
                       <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-400">Status</th>
                     </tr>
                   </thead>
@@ -205,6 +214,42 @@ export default function App() {
                               }`}>
                                 {result.hasToC ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
                                 {result.hasToC ? 'TRUE' : 'FALSE'}
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            {result.status === 'loading' ? (
+                              <div className="h-4 w-24 bg-gray-100 animate-pulse rounded" />
+                            ) : result.listAnalysis ? (
+                              <div className="flex flex-col gap-1">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[10px] font-bold text-gray-400 uppercase">Is a list there?</span>
+                                  <span className={`text-[10px] font-black ${result.listAnalysis.isPresent ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                    {result.listAnalysis.isPresent ? 'TRUE' : 'FALSE'}
+                                  </span>
+                                </div>
+                                {result.listAnalysis.isPresent && (
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase">Developed with ul/ol?</span>
+                                    <span className={`text-[10px] font-black ${result.listAnalysis.isStandard ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                      {result.listAnalysis.isStandard ? 'TRUE' : 'FALSE'}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            ) : null}
+                          </td>
+                          <td className="px-6 py-4">
+                            {result.status === 'loading' ? (
+                              <div className="h-4 w-12 bg-gray-100 animate-pulse rounded" />
+                            ) : (
+                              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+                                result.hasFAQ 
+                                  ? 'bg-emerald-100 text-emerald-700' 
+                                  : 'bg-rose-100 text-rose-700'
+                              }`}>
+                                {result.hasFAQ ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
+                                {result.hasFAQ ? 'TRUE' : 'FALSE'}
                               </span>
                             )}
                           </td>
@@ -236,7 +281,7 @@ export default function App() {
                               exit={{ opacity: 0, height: 0 }}
                               className="bg-gray-50/50"
                             >
-                              <td colSpan={3} className="px-6 py-8">
+                              <td colSpan={5} className="px-6 py-8">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                   {Object.entries(result.details as Record<string, AnalysisDetail>).map(([key, detail]) => (
                                     <div key={key} className="bg-white p-4 rounded-xl border border-black/5 shadow-sm">
